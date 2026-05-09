@@ -1,9 +1,10 @@
+import os
 import yfinance as yf
 import requests
 import time
 from datetime import datetime
 
-DISCORD_WEBHOOK = "APNA_WEBHOOK_URL"
+DISCORD_WEBHOOK = os.environ.get("DISCORD_WEBHOOK")
 
 def send_discord(msg):
     requests.post(DISCORD_WEBHOOK, json={"content": msg})
@@ -30,7 +31,6 @@ while True:
     try:
         now = datetime.now().strftime("%H:%M:%S")
         df = get_data()
-
         price = float(df['Close'].iloc[-1])
         ma20  = float(df['MA20'].iloc[-1])
         ma50  = float(df['MA50'].iloc[-1])
@@ -47,11 +47,11 @@ while True:
         print(f"⏰ {now} | Gold: ${price:.2f} | RSI: {rsi:.1f}")
 
         if ma_bull and macd_up and rsi < 70:
-            send_discord(f"🟢 BUY!\n💛 Gold: ${price:.2f}\nRSI: {rsi:.1f}")
+            send_discord(f"🟢 BUY!\n💛 ${price:.2f}\nRSI: {rsi:.1f}")
         elif not ma_bull and macd_dn and rsi > 30:
-            send_discord(f"🔴 SELL!\n💛 Gold: ${price:.2f}\nRSI: {rsi:.1f}")
+            send_discord(f"🔴 SELL!\n💛 ${price:.2f}\nRSI: {rsi:.1f}")
 
-        time.sleep(3600)  # Har 1 ghante mein check
+        time.sleep(3600)
 
     except Exception as e:
         print(f"Error: {e}")
